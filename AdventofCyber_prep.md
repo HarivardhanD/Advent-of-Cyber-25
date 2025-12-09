@@ -146,3 +146,129 @@
 
 
 - query => `sourcetype=firewall_logs src_ip="10.10.1.5" AND dest_ip="<REDACTED>" AND action="ALLOWED" | stats sum(bytes_transferred) by src_ip ` => this shows how much bytes of data is transferred by src_ip , ie our device ip to the target or attacker 
+
+
+==============================================================================================================================================================================================================================================================================================================
+#                                               AI IN SECURITY
+==============================================================================================================================================================================================================================================================================================================
+
+- Yes this room explains and tells the use of AI in cyber security to automate the task.
+
+# Defensve security
+
+- in the defense field , AI can be used to analyze logs and summarize them .
+- Also, it can be used to detect latest malware and notify.
+
+# OFFENISVIE SECURITY
+
+- There are some task, like using tools or brute forcing which involves repeatedly using the same the tool or repeating the task again and again , so instead of doing this ourself we can ask AI to do such task , reducing manual labour
+
+
+# CONCLUSION
+
+- These benefits doesnt mean , AI is perfect , we still need humans for resolving few things as AI can have only trained knowledge .
+
+-  We cannot assume the output from AI is 100% correct. Efforts must be made to verify the information it provides. Additionally, managing challenges such as keeping data private, securing AI models, and informing users properly requires careful consideration.
+
+
+
+
+
+==============================================================================================================================================================================================================================================================================================================
+#                                         IDOR - Santa’s Little IDOR
+==============================================================================================================================================================================================================================================================================================================
+
+
+
+- IDOR stands for Insecure Direct Object Reference and is a type of access control vulnerability
+
+- Lets understand the basic IDOR with the example given below:
+    - lets consider : `https://awesome.website.thm/TrackPackage?packageID=1001`
+    - now , as u can see , in the above URL we have packageID=1001 , so pkdid is given in url.
+    - Now , when we do , packageID=1002 , whaat might happen is , u might get access to objectID 1002.
+    - This itself, ie getting access to other objectID , which doesnt belong to you is called IDOR
+
+- So ,when user re writes the pkgid as 1002, the web application must ask, if the user is authentic and authorized and only then it must give access to object 1002, but in case of IDOR,the web doesnt check the same and directly gives access to 1002.
+
+
+-  The real issue is that the system doesn’t check whether the person making the request is allowed to access it.
+
+- A lot of people try to “fix” IDORs by hiding or encoding IDs. For example, changing /user/1 to /user/ea21f09b2. That might make it look harder to guess, but if the server still isn’t checking permissions, it’s just as insecure. The vulnerability isn’t about how the object is referenced, it’s about missing authorization checks.
+
+- To understand the root cause of IDOR, it is important to understand the basic principles of authentication and authorization:
+    - Authentication: The process by which you verify who you are. For example, supplying your username and password.
+
+    - Authorization: The process by which the web application verifies your permissions. For example, are you allowed to visit the admin page of a web application, or are you allowed to make a payment using a specific account?
+
+
+- Authorization cannot happen before authentication. ie: If the application doesn't know who you are, it cannot verify what permissions your user has
+
+
+- Now lets see what are types of privilage escalation and under what type does IDOR come to :
+
+    - Vertical privilege escalation: This refers to privilege escalation where you gain access to more features. For example, you may be a normal user on the application, but can perform actions that should be restricted for an administrator.
+
+    - Horizontal privilege escalation: This refers to privilege escalation where you use a feature you are authorized to use, but gain access to data that you are not allowed to access. For example, you should only be able to see your accounts, not someone else's accounts.
+
+
+- I hands-on did it as follows : 
+    - Logged in as legit user and then went to inspect and network tab
+    - there , in the GET section, i saw that userid=10 , was beign mentioned
+    - so i went went to storage tab and then , clicked local storage and then in the https://..../userid=10 , i changed the user id from 10 to 11, refreshed the page and booyah i could get access to the other objec without any authentication , hence IDOR was detected.
+
+
+- Don't rely on tricks like Base64 or hashing the IDs; those can still be guessed or decoded. Instead, keep all the real permission checks on the server. Whenever a request comes in, check: "Does this user own or have permission to view this item?"
+
+
+==============================================================================================================================================================================================================================================================================================================
+#                                   Malware Analysis - Egg-xecutable     
+==============================================================================================================================================================================================================================================================================================================
+
+
+- Malware analysis is the process of examining a malicious file to understand its functionality, operation, and methods for defence against it.
+    - ex: For example, could the malicious file communicate with an attacker's server? We can block that server.
+
+- So , malware analysis is always done in a controlled environment, and there are 2 types of analysis done :
+    - STATIC ANALYSIS : The process of analyzing malware without executing it, but in a controlled environment.
+
+    - DYNAMIC ANALYSIS : Executing the malware and analysing it , in a controlled environment.
+
+- All the testing for malware, shall be always done in sandboxes, because directly testing it on our system can have potential harm for our files , but testing in sandboxes prevents it from affecting our system.
+
+- The use of sandboxes is part of the golden rule in malware analysis: never run dangerous applications on devices you care about.
+
+
+
+# Interactive: Static Analysis
+
+- As we alluded to previously in this room, we use static analysis to gather information about a sample without executing it and digging deep.  
+
+- while doing the static analysis, we should take a note for all of these :
+
+    - checksum -> Every malware has checksum or it is like identity to itself.
+
+    - Strings ->  for example, IP addresses, URLs, commands, or even passwords!
+
+    - Imports ->  rather than building everything from scratch, applications will use operating system functions and libraries to interact with the OS.
+
+    - Resources -> "Resources" contain data such as the icon that is displayed to the user. Malware can hide itself in the form of pdf or word file , so the user cant recognize it
+
+
+- This can be done with tool called : ` peStudio `
+
+- Go to -> PeStudio -> File -> new -> malware.exe
+
+
+
+# Interactive: Dynamic Analysis
+
+
+-  Dynamic analysis involves executing the malicious sample to identify its behaviours and how it interacts with the operating system.
+
+- For this , we can use tool ` RegSHot` and its like , i take snapshot of registry before runniing the malware and then, take a snapshot with malware running and after than we compare both snapshots and check , which registry have been infected
+
+- Then, i compare bothb the snapshots and look where the malware.exe is being executed in the registry.
+
+- Another tool that can be used is ProcMon, where i first monitor the system without executing the malware and the i execute the malware and take note/capture the logs
+
+- Then we can filter based on protocol / malware.exe to see where it is being executed and it also captures each and every corner of system , so it also captures if the malware is hiding
